@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LocationCheckInDJWFocus</string>
+    <string name="notification_channel_name">Location check-in</string>
+    <string name="notification_channel_desc">Persistent status of location check-in</string>
+</resources>
