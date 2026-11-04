@@ -11,6 +11,10 @@ class CheckInPrefs(context: Context) {
         get() = prefs.getString(KEY_URL, "") ?: ""
         set(value) = prefs.edit().putString(KEY_URL, value).apply()
 
+    var apiKey: String
+        get() = prefs.getString(KEY_API_KEY, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_API_KEY, value).apply()
+
     var intervalMin: Int
         get() = prefs.getInt(KEY_INTERVAL_MIN, DEFAULT_INTERVAL_MIN)
         set(value) = prefs.edit().putInt(KEY_INTERVAL_MIN, value).apply()
@@ -55,9 +59,10 @@ class CheckInPrefs(context: Context) {
             prefs.edit().putBoolean(KEY_CYCLE_IN_PROGRESS, value).commit()
         }
 
-    fun saveSettings(url: String, intervalMin: Int) {
+    fun saveSettings(url: String, apiKey: String, intervalMin: Int) {
         prefs.edit()
             .putString(KEY_URL, url)
+            .putString(KEY_API_KEY, apiKey)
             .putInt(KEY_INTERVAL_MIN, intervalMin)
             .apply()
     }
@@ -82,6 +87,7 @@ class CheckInPrefs(context: Context) {
         const val MIN_INTERVAL_MIN = 5
 
         private const val KEY_URL = "url"
+        private const val KEY_API_KEY = "api_key"
         private const val KEY_INTERVAL_MIN = "interval_min"
         private const val KEY_RUNNING = "running"
         private const val KEY_SEQ = "seq"

@@ -69,6 +69,7 @@ private fun CheckInScreen(modifier: Modifier = Modifier) {
     val prefs = remember { CheckInPrefs(context) }
 
     var url by remember { mutableStateOf(prefs.url) }
+    var apiKey by remember { mutableStateOf(prefs.apiKey) }
     var intervalText by remember { mutableStateOf(prefs.intervalMin.toString()) }
     var running by remember { mutableStateOf(prefs.running) }
     var lastResult by remember { mutableStateOf(prefs.lastResult) }
@@ -118,7 +119,7 @@ private fun CheckInScreen(modifier: Modifier = Modifier) {
 
     fun actuallyStart() {
         val interval = intervalText.toIntOrNull() ?: return
-        prefs.saveSettings(url.trim(), interval)
+        prefs.saveSettings(url.trim(), apiKey.trim(), interval)
         prefs.running = true
         running = true
         errorMessage = ""
@@ -187,6 +188,9 @@ private fun CheckInScreen(modifier: Modifier = Modifier) {
         if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
             return "URL must start with http:// or https://"
         }
+        if (apiKey.trim().isEmpty()) {
+            return "API key is required"
+        }
         val interval = intervalText.toIntOrNull()
             ?: return "Interval must be a number of minutes"
         if (interval < CheckInPrefs.MIN_INTERVAL_MIN) {
@@ -208,7 +212,7 @@ private fun CheckInScreen(modifier: Modifier = Modifier) {
             errorMessage = validationError
             return
         }
-        prefs.saveSettings(url.trim(), intervalText.toInt())
+        prefs.saveSettings(url.trim(), apiKey.trim(), intervalText.toInt())
         when {
             ContextCompat.checkSelfPermission(
                 context,
@@ -251,6 +255,14 @@ private fun CheckInScreen(modifier: Modifier = Modifier) {
             onValueChange = { url = it },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Check-in URL") },
+            singleLine = true,
+            enabled = !running,
+        )
+        OutlinedTextField(
+            value = apiKey,
+            onValueChange = { apiKey = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("API key") },
             singleLine = true,
             enabled = !running,
         )

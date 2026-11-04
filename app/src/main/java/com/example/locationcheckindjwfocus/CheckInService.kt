@@ -125,7 +125,7 @@ class CheckInService : Service() {
             }
             val seq = prefs.seq + 1
             val sendTime = System.currentTimeMillis()
-            val postResult = postCheckIn(prefs.url, fix, seq, intervalMin, sendTime)
+            val postResult = postCheckIn(prefs.url, prefs.apiKey, fix, seq, intervalMin, sendTime)
             val resultText = when {
                 fix.location == null && postResult.ok -> "No location; POST ok"
                 fix.location == null -> "No location; POST failed: ${postResult.reason}"
@@ -257,6 +257,7 @@ class CheckInService : Service() {
 
     private fun postCheckIn(
         urlString: String,
+        apiKey: String,
         fix: LocationFix,
         seq: Long,
         intervalMin: Int,
@@ -285,6 +286,10 @@ class CheckInService : Service() {
             put("seq", seq)
             put("interval_min", intervalMin)
         }
+        val trimmedKey = apiKey.trim()
+        if (trimmedKey.isEmpty()) {
+            return PostResult(ok = false, reason = "API key is empty")
+        }
         var connection: HttpURLConnection? = null
         return try {
             val url = URL(urlString)
@@ -295,6 +300,7 @@ class CheckInService : Service() {
                 doOutput = true
                 useCaches = false
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty("X-API-Key", trimmedKey)
             }
             OutputStreamWriter(connection.outputStream, Charsets.UTF_8).use { writer ->
                 writer.write(body.toString())
